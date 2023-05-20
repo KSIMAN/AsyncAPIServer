@@ -3,7 +3,7 @@
 #include <boost/asio.hpp>
 #include <vector>
 #include "databaseconnector.h"
-
+#include <any> //change later
 
 
 
@@ -43,13 +43,26 @@ protected:
 
     int _listen_port;
 
-
     std::vector<boost::asio::socket_base*> clients;
 
-
-
     std::string read_(boost::asio::ip::tcp::socket &socket);
-    void send_(boost::asio::ip::tcp::socket &socket, const std::string &message);
+    void send_(boost::asio::ip::tcp::socket &socket, const std::string &message); // поч ссыль?
+
+/*
+    void do_accept(){
+      acceptor_.async_accept(socket_,
+                             [this](boost::system::error_code ec) {
+                               if (!ec) {
+                                 std::cout << "accept connection\n";
+
+                            //     std::make_shared<Session>(std::move(socket_))->start();
+                               }
+                               do_accept();
+                             });
+    }
+   boost::asio::ip::tcp::acceptor acceptor_; */
+   // boost::asio::ip::tcp::socket socket_;
+
 };
 
 #endif // SERVER_H

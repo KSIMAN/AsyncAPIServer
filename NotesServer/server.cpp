@@ -3,10 +3,10 @@
 
 Server::Server(boost::asio::io_service &service, int port)
 {
-
+     //дурка
 }
 
-Server::Server(int port) :
+Server::Server(int port):
     _listen_port(port),
     _service()
 {
