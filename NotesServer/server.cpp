@@ -1,25 +1,26 @@
 #include "server.h"
 
 
-Server::Server(boost::asio::io_service &service, int port)
+void HttpServer::Run()
 {
-     //дурка
+    sThread.reset(new boost::thread(boost::bind(&HttpServer::thread_main, this)));
 }
 
-Server::Server(int port):
-    _listen_port(port),
-    _service()
+void HttpServer::thread_main()
 {
-
+    start_accept();
+    io_service.run();
 }
 
-std::string Server::read_(boost::asio::ip::tcp::socket & socket) {
-       boost::asio::streambuf buf;
-       boost::asio::read_until( socket, buf, "\n" );
-       std::string data = boost::asio::buffer_cast<const char*>(buf.data());
-       return data;
+void HttpServer::start_accept()
+{
+    boost::shared_ptr<Request> req (new Request(*this));
+    acceptor.async_accept(*req->socket,
+                          boost::bind(&HttpServer::handle_accept, this, req, boost::placeholders::_1));
 }
-void Server::send_(boost::asio::ip::tcp::socket & socket, const std::string& message) {
-       const std::string msg = message + "\n";
-       boost::asio::write( socket, boost::asio::buffer(message) );
+
+void HttpServer::handle_accept(boost::shared_ptr<Request> req, const boost::system::error_code& error)
+{
+    if (!error)  req->answer();
+    start_accept();
 }

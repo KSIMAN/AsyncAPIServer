@@ -1,68 +1,45 @@
 #ifndef SERVER_H
 #define SERVER_H
-#include <boost/asio.hpp>
 #include <vector>
+
 #include "databaseconnector.h"
-#include <any> //change later
+#include "requestprocessor.h"
 
+#include <iostream>
+#include <ostream>
+#include <istream>
+#include <ctime>
+#include <string>
+#include <boost/asio.hpp>
+#include <boost/shared_ptr.hpp>
 
+#include <boost/thread.hpp>
 
-class Server
+using boost::asio::ip::tcp;
+
+class HttpServer
 {
-public:
-    Server(boost::asio::io_service & service, int port);
-    Server(int port);
+    public:
 
-     ~Server();
-    /*Server Running functions*/
+    HttpServer(unsigned int port) : acceptor(io_service, tcp::endpoint(tcp::v4(), port)) {};
+    ~HttpServer() { if (sThread) sThread->join(); }
 
-    void startListening();
+    void Run();
 
-    void acceptConnetion(boost::asio::socket_base * client);
+    boost::asio::io_service io_service;
 
-    /*Server Communications functions*/
+    private:
+    tcp::acceptor acceptor;
+    boost::shared_ptr<boost::thread> sThread;
 
-    void onGotRequest(const char * message, std::size_t len);
-
-    void sendAnswer(boost::asio::socket_base * client, const char * answer);
-
+    void thread_main();
     /* Callbacks*/
-    void onConnectionBeginConnectionCallback();
 
+    void start_accept();
 
-    /* Getters */
-
-    void setListenPort(int port ){  _listen_port = port; };
-
-
-protected:
-
-    boost::asio::io_service _service;
-
-    DatabaseConnector * db_connector_ptr;
-
-    int _listen_port;
-
-    std::vector<boost::asio::socket_base*> clients;
-
-    std::string read_(boost::asio::ip::tcp::socket &socket);
-    void send_(boost::asio::ip::tcp::socket &socket, const std::string &message); // поч ссыль?
-
-/*
-    void do_accept(){
-      acceptor_.async_accept(socket_,
-                             [this](boost::system::error_code ec) {
-                               if (!ec) {
-                                 std::cout << "accept connection\n";
-
-                            //     std::make_shared<Session>(std::move(socket_))->start();
-                               }
-                               do_accept();
-                             });
-    }
-   boost::asio::ip::tcp::acceptor acceptor_; */
-   // boost::asio::ip::tcp::socket socket_;
+    void handle_accept(boost::shared_ptr<Request> req, const boost::system::error_code& error); //handle accept
 
 };
+
 
 #endif // SERVER_H

@@ -24,6 +24,7 @@ public:
 
 
 
+
     /*Communications with db*/
 
     /* Add task to database*/
@@ -32,6 +33,8 @@ public:
     /* Removes Task from database */
 
     bool removeTask(std::string task_name);
+
+    bool editTask();
 
     /* Check if task exists */
 

@@ -1,12 +1,9 @@
-#include <iostream>
-
-
-using namespace std;
-
-int main()
+#include "server.h"
+#include "logger.h"
+int main (int argc, char *argv[])
 {
-
-
-    return 0;
+   Logger::GetInstance()->appendMessageToLog("Starting server!!", message_type::INFO);
+   HttpServer server(8080);
+   server.Run();
 
 }
